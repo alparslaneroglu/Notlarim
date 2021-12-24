@@ -171,7 +171,7 @@ namespace Notlarim101.WebApp.Controllers
                 };
                 notifyObj.Items.Add("Lütfen e-posta adresinize gönderdiğimiz aktivasyon linkine tıklayarak hesabınızı aktive ediniz. Hesabınızı aktive etmeden not ekleyemez ve beğenme yapamazsınız.");
 
-                return View("Ok",notifyObj);
+                return View("Ok", notifyObj);
             }
             return View(model);
         }
@@ -221,23 +221,77 @@ namespace Notlarim101.WebApp.Controllers
         }
         public ActionResult EditProfile()
         {
-            return View();
+            NotlarimUser currentUser = Session["login"] as NotlarimUser;
+            NotlarimUserManager num = new NotlarimUserManager();
+            BusinessLayerResult<NotlarimUser> res = num.GetUserById(currentUser.Id);
+            if (res.Errors.Count > 0)
+            {
+                ErrorViewModel errorNotifyObj = new ErrorViewModel()
+                {
+                    Title = "Hata oluştu",
+                    Items = res.Errors
+                };
+                return View("Error",errorNotifyObj );
+            }
+            return View(res.Result);
         }
         [HttpPost]
-        public ActionResult EditProfile(int id)
+        public ActionResult EditProfile(NotlarimUser model,HttpPostedFileBase ProfileImage)
         {
-            return View();
+            ModelState.Remove("ModifiedUsername");
+            if (ModelState.IsValid)
+            {
+                if (ProfileImage != null && (ProfileImage.ContentType == "image/jpeg" || ProfileImage.ContentType == "image/jpg" || ProfileImage.ContentType == "image/png"))
+                {
+                    string filename = $"user_{model.Id}.{ProfileImage.ContentType.Split('/')[1]}"; //user yazıcaz sonra o anki session daki id 5 se ıd 5 dicek sonra resim yapısındaki yapıyı bölüyor image e 0 jpeg e 1 diyor.Ve onu alıyor.
+                    ProfileImage.SaveAs(Server.MapPath($"~/images/{filename}")); //Burda oluşan klasörler serverdada oluşacak.İmages klasörüne getiriyoruz. ve orada filename olarak dosyayı oluştur.
+                    model.ProfileImageFilename = filename; //modelede atamayı yaptık.
+                }
+
+                NotlarimUserManager num = new NotlarimUserManager();
+                BusinessLayerResult<NotlarimUser> res = num.UpdateProfile(model);
+                if (res.Errors.Count > 0)
+                {
+                    ErrorViewModel errorNotifyObj = new ErrorViewModel()
+                    {
+                        Title = "Profil güncellenemedi.",
+                        Items = res.Errors,
+                        RedirectingUrl="/Home/EditProfile"
+                    };
+                    return View("Error", errorNotifyObj);
+                }
+
+                Session["login"] = res.Result;
+                return RedirectToAction("ShowProfile");
+
+            }
+            return View(model);
         }
 
         public ActionResult DeleteProfile()
         {
-            return View();
+            NotlarimUser currentUser = Session["login"] as NotlarimUser;
+            NotlarimUserManager num = new NotlarimUserManager();
+            BusinessLayerResult<NotlarimUser> res = num.RemoveUserById(currentUser.Id);
+            if (res.Errors.Count > 0)
+            {
+                ErrorViewModel errorNotifyObj = new ErrorViewModel()
+                {
+                    Title = "Profil silinemedi",
+                    Items = res.Errors,
+                    RedirectingUrl = "/Home/ShowProfile"
+                };
+                return View("Error", errorNotifyObj);
+              
+            }
+            Session.Clear();
+            return RedirectToAction("Index");
         }
-        [HttpPost]
-        public ActionResult DeleteProfile(int id)
-        {
-            return View();
-        }
+        //[HttpPost]
+        //public ActionResult DeleteProfile(int id)
+        //{
+        //    return View();
+        //}
         //public ActionResult TestNotify()
         //{
         //    ErrorViewModel model = new ErrorViewModel()

@@ -15,6 +15,7 @@ namespace Notlarim101.Entity
         public string Title { get; set; }
         [StringLength(150)]
         public string Description { get; set; }
+        public string Selamlama  { get; set; }
         
 
         public virtual List<Note> Notes { get; set; }
