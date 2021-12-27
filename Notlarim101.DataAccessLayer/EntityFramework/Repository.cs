@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using Notlarim101.Common;
 using Notlarim101.Core.DataAccess;
 using Notlarim101.DataAccessLayer;
-using Notlarim101.DataAccessLayer.Abstract;
 using Notlarim101.Entity;
 
 namespace Notlarim101.DataAccessLayer.EntityFramework
@@ -36,12 +35,12 @@ namespace Notlarim101.DataAccessLayer.EntityFramework
         {
             return objSet.Where(where).ToList();
         }
-        public IQueryable<T> QList(Expression<Func<T, bool>> query)
+        public IQueryable<T> QList()
         {
-            return objSet.Where(query);
+            return objSet.AsQueryable<T>(); //AsQueryable nesne için bir istekte bulunuyorum.Bu işleme tabi tutmuyorum.Sadece orta tutuyorum.Bir işlem gerketiğinide kullanıyorum.
         }
 
-        public int Insert(T obj)///Calisma mantigi sorulacak
+        public int Insert(T obj)///EntityFramework içerisinde Add işlemi gelince bir trucker işleme giriyor.Bu nesneleri edit halde bırakıyor.Bu yüzden burada add metodunu üst tarafta yazmamızı sağlıyor.
         {
             objSet.Add(obj);
             if (obj is MyEntityBase)

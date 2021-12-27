@@ -1,0 +1,13 @@
+﻿Önce hazır şekilde categorycontroller oluşturduk.
+IRepository artık ihtiyacımız kalmadı ve sildik.
+webconfig de oluşan connectionstringi sildikl.
+WebApp e core u referans verdilk
+Artık Managerbase den miras aldığımız için Category manager içerisini sildik.
+categorycontrollerde categorymangeri newledik.Sonra içerisini düzelttik.Başta otomatik oluşmuştu 
+CategoryManager içerisinde daha önce commit ledğimiz yeri açıyoruz.
+Category manager içerisinde Delete metodunu eziyoruz.Bunu yapabilmemizi sağlayan şey ManagerBase in abstract class olmasıdır.Artık Delete i farklı kullanmamız gerekiyor.Bu yüzden override etmemiz gerekti.
+ToList dediğimiz bir paket hale çekmiş oluyoruz verileri.CategoryManager da tolist hale getirmesek her foreach döngüsünde delete işlemi yapacak ve indexleme değişecek ve program hata verecek bunu toList ile ortadan kaldırıyoruz.
+NoteManager a Manager base i referans verdik.
+CategoryManager içerisinde LikedManager ile Comment Manageri new ledik.
+Notlarimusernager a Manager base i miras verdik.Ve artık Repository gerek kalmadı.
+Global alanda BusinessLayerResul new lemesini tanımladık ve metodların içerisinde tekrar tekrar new lemeye gerek kalmadı.

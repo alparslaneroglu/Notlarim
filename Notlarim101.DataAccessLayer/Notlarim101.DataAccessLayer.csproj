@@ -54,7 +54,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Abstract\IRepository.cs" />
     <Compile Include="EntityFramework\MyInitializer.cs" />
     <Compile Include="EntityFramework\NotlarimContext.cs" />
     <Compile Include="EntityFramework\Repository.cs" />
@@ -102,6 +101,9 @@
     <EmbeddedResource Include="Migrations\202112240935086_selamlamasil.resx">
       <DependentUpon>202112240935086_selamlamasil.cs</DependentUpon>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Abstract\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
