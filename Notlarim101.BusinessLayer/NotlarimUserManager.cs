@@ -8,7 +8,7 @@ using Notlarim101.Entity.ValueObject;
 
 namespace Notlarim101.BusinessLayer
 {
-    public class NotlarimUserManager:ManagerBase<NotlarimUser>
+    public class NotlarimUserManager : ManagerBase<NotlarimUser>
     {
         //Kullanici username kontrolu yapmaliyim
         //kullnici email kontrolu yapmaliyim
@@ -21,16 +21,16 @@ namespace Notlarim101.BusinessLayer
         {
             NotlarimUser user = Find(s => s.Username == data.Username || s.Email == data.Email);
 
-            
 
-            if (user!=null)
+
+            if (user != null)
             {
-                if (user.Username==data.Username)
+                if (user.Username == data.Username)
                 {
                     res.AddError(ErrorMessageCode.UsernameAlreadyExist, "Kullanici adi kayitli");
                 }
 
-                if (user.Email==data.Email)
+                if (user.Email == data.Email)
                 {
                     res.AddError(ErrorMessageCode.EmailalreadyExist, "Email kayitli");
                 }
@@ -38,14 +38,14 @@ namespace Notlarim101.BusinessLayer
             }
             else
             {
-                int dbResult = Insert(new NotlarimUser()
+                int dbResult = base.Insert(new NotlarimUser() //ManagerBase içerisindeki ınsert kısmı esas kayıt işlemi burada yapılır.
                 {
                     Name = data.Name,
                     Surname = data.Surname,
                     Username = data.Username,
                     Email = data.Email,
                     Password = data.Password,
-                    ProfileImageFilename="arog.jpg",
+                    ProfileImageFilename = "arog.jpg",
                     ActivateGuid = Guid.NewGuid(),
                     IsActive = false,
                     IsAdmin = false,
@@ -54,7 +54,7 @@ namespace Notlarim101.BusinessLayer
                     //CreatedOn = DateTime.Now,
                     //ModifiedUsername = "system"
                 });
-                if (dbResult>0)
+                if (dbResult > 0)
                 {
                     res.Result = Find(s => s.Email == data.Email && s.Username == data.Username);
 
@@ -74,10 +74,10 @@ namespace Notlarim101.BusinessLayer
         {
             //Giris kontrolu
             //Hesap aktif edilmismi kontrolu
-            
-           
+
+
             res.Result = Find(s => s.Username == data.Username && s.Password == data.Password);
-            if (res.Result!=null)
+            if (res.Result != null)
             {
                 if (!res.Result.IsActive)
                 {
@@ -95,14 +95,14 @@ namespace Notlarim101.BusinessLayer
 
         public BusinessLayerResult<NotlarimUser> ActivateUser(Guid id)
         {
-          
+
             res.Result = Find(x => x.ActivateGuid == id);
 
-            if (res.Result!=null)
+            if (res.Result != null)
             {
                 if (res.Result.IsActive)
                 {
-                    res.AddError(ErrorMessageCode.UserAlreadyActive,"Bu hesap daha önce aktif edilmiş.");
+                    res.AddError(ErrorMessageCode.UserAlreadyActive, "Bu hesap daha önce aktif edilmiş.");
                     return res;
 
                 }
@@ -118,9 +118,9 @@ namespace Notlarim101.BusinessLayer
 
         public BusinessLayerResult<NotlarimUser> GetUserById(int id)
         {
-            
+
             res.Result = Find(s => s.Id == id);
-            if (res.Result==null)
+            if (res.Result == null)
             {
                 res.AddError(ErrorMessageCode.UserNotFound, "Kullanıcı bulunamadı..");
             }
@@ -130,14 +130,14 @@ namespace Notlarim101.BusinessLayer
         public BusinessLayerResult<NotlarimUser> UpdateProfile(NotlarimUser data)
         {
             NotlarimUser user = Find(s => s.Id != data.Id && (s.Username == data.Username || s.Email == data.Email));
-            
-            if (user!=null && user.Id !=data.Id)
+
+            if (user != null && user.Id != data.Id)
             {
-                if (user.Username==data.Username)
+                if (user.Username == data.Username)
                 {
                     res.AddError(ErrorMessageCode.UsernameAlreadyExist, "Bu kullanıcı adı daha önce kaydedilmiş.");
                 }
-                if (user.Email==data.Email)
+                if (user.Email == data.Email)
                 {
                     res.AddError(ErrorMessageCode.EmailalreadyExist, "Bu E-mail daha önce kaydedilmiş.");
                 }
@@ -153,7 +153,7 @@ namespace Notlarim101.BusinessLayer
             {
                 res.Result.ProfileImageFilename = data.ProfileImageFilename;
             }
-            if (Update(res.Result) == 0)
+            if (base.Update(res.Result) == 0)
             {
                 res.AddError(ErrorMessageCode.ProfileCouldNotUpdate, "Profil güncellenemedi.");
             }
@@ -163,12 +163,12 @@ namespace Notlarim101.BusinessLayer
         public BusinessLayerResult<NotlarimUser> RemoveUserById(int id)
         {
 
-            NotlarimUser user = Find(s => s.Id==id);
-            
+            NotlarimUser user = Find(s => s.Id == id);
 
-            if (user!=null)
+
+            if (user != null)
             {
-                if (Delete(user)==0)
+                if (Delete(user) == 0)
                 {
                     res.AddError(ErrorMessageCode.UserCouldNotRemove, "Kullanıcı silinemedi");
                 }
@@ -180,5 +180,69 @@ namespace Notlarim101.BusinessLayer
             }
             return res;
         }
-    }
+        //Hidding Method
+        public new BusinessLayerResult<NotlarimUser> Insert(NotlarimUser data) // newleyerek geçici olarak buradaki Inserti kullanarak int i görmezden geliyoruz.Yoksa bize notlarımusercontroller da int tipinden dolayı hata veriyor.
+        {
+            NotlarimUser user = Find(s => s.Username == data.Username || s.Email == data.Email);
+            res.Result = data;
+            if (user != null)
+            {
+                if (user.Username == data.Username)
+                {
+                    res.AddError(ErrorMessageCode.UsernameAlreadyExist, "Kullanici adi kayitli");
+                }
+
+                if (user.Email == data.Email)
+                {
+                    res.AddError(ErrorMessageCode.EmailalreadyExist, "Email kayitli");
+                }
+                //throw new Exception("Kayitli kullanici yada e-posta adresi");
+            }
+            else
+            {
+                res.Result.ProfileImageFilename = "user1.jpeg";
+                res.Result.ActivateGuid = Guid.NewGuid();
+                if (base.Insert(res.Result) == 0)
+                {
+                    res.AddError(ErrorMessageCode.UserCouldNotInserted, "Kullanıcı eklenemedi.");
+                }
+
+
+            }
+
+            return res;
+        }
+
+        public new BusinessLayerResult<NotlarimUser> Update(NotlarimUser data)
+        {
+            NotlarimUser user = Find(s => s.Id != data.Id && (s.Username == data.Username || s.Email == data.Email));
+
+            if (user != null && user.Id != data.Id)
+            {
+                if (user.Username == data.Username)
+                {
+                    res.AddError(ErrorMessageCode.UsernameAlreadyExist, "Bu kullanıcı adı daha önce kaydedilmiş.");
+                }
+                if (user.Email == data.Email)
+                {
+                    res.AddError(ErrorMessageCode.EmailalreadyExist, "Bu E-mail daha önce kaydedilmiş.");
+                }
+                return res;
+            }
+            res.Result = Find(s => s.Id == data.Id);
+            res.Result.Email = data.Email;
+            res.Result.Name = data.Name;
+            res.Result.Surname = data.Surname;
+            res.Result.Password = data.Password;
+            res.Result.Username = data.Username;
+            res.Result.IsActive = data.IsActive;
+            res.Result.IsAdmin = data.IsAdmin;
+            if (base.Update(res.Result) == 0)
+            {
+                res.AddError(ErrorMessageCode.UserCouldNotUpdated, "Kullanıcı güncellenemedi.");
+            }
+            return res;
+        }
+    } 
+
 }

@@ -1,0 +1,3 @@
+﻿önce webapp de app_code oluşturduk. Add.ASpnetFolder dan
+İçersine bootstrap diye cshtml oluşturduk.İçinde helper metodları olacak.
+Burada index sayfasındaki butonların helperlarını oluştararak index içerisinde buttonlar yerine  bu helperleri kullandık.Diğerlerini commit satırına aldık.
